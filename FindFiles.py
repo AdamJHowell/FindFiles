@@ -1,16 +1,18 @@
-import os
 import fnmatch
+import os
 from datetime import datetime
 from pathlib import Path
-
 from typing import List
 
 """
 Data structure:
   absolute_path_to_file: str  # This will be the absolute path with the filename.
+  relative_path_to_file: str  # This will be the absolute_path_to_file with the base directory removed.
+  artist_dir: str  # This will be the folder designating the artist.
+  album_dir: str  # This will be the folder designating the album.
   file_path: List[pathlib.PurePath, pathlib.PurePosixPath, pathlib.PureWindowsPath, pathlib.Path, pathlib.PosixPath, pathlib.WindowsPath]
-  file_name: str
-  file_extension: str
+  file_name: str  # This will be the file name with the extension.
+  file_extension: str  # This is just the file extension, intended for sorting.
 os.walk() returns a 3-tuple:
   dirpath is a string, the path to the directory.  
   dirnames is a list of the names of the subdirectories in dirpath (excluding '.' and '..').
@@ -37,29 +39,34 @@ def find_all_files( root_dir: str ) -> List[str]:
   """
   List all files in the specified directory.
   """
-  all_files = []
+  all_files: List[str] = []
+  dirpath: str
+  dirnames: List[str]
+  filenames: List[str]
   for dirpath, dirnames, filenames in os.walk( root_dir ):
-    print( f"dirpath type: {type( dirpath )}" )
-    print( f"dirnames type: {type( dirnames )}" )
-    print( f"filenames type: {type( filenames )}" )
-    # Convert the dirpath to a Path object
+    # dirpath is a string.
+    # dirnames and filenames are lists of strings.
+
+    # Convert dirpath to Path object.
     pathlib_dirpath = Path( dirpath )
     all_files.extend( filenames )
+    # Convert dirnames and filenames to Path containers.
+    pathlib_dirnames: List[Path]
+    pathlib_dirnames = [pathlib_dirpath / dirname for dirname in dirnames]
+    pathlib_filenames: List[Path]
+    pathlib_filenames = [pathlib_dirpath / filename for filename in filenames]
 
-    # Optionally convert dirnames and filenames to Path objects
-    dirnames = [pathlib_dirpath / dirname for dirname in dirnames]
-    filenames = [pathlib_dirpath / filename for filename in filenames]
-
-    # Now you can use the Path object and its methods
+    # Process the Path objects.
     print( f"Directory: {dirpath}" )
-    print( f"  Subdirectories: {dirnames}" )
-    for dirname in dirnames:
-      print( f"    dirname type: {type( dirname )}" )
-      print( f"    dirname: {dirname}" )
-    print( f"  Files: {filenames}" )
-    for filename in filenames:
-      print( f"    filename: {type( filename )}" )
-      print( f"    filename: {filename}" )
+    if len( pathlib_dirnames ) > 0:
+      print( f"  {len( pathlib_dirnames )} Subdirectories: {pathlib_dirnames}" )
+      for i, dirname in enumerate( pathlib_dirnames, start = 1 ):
+        # dirname is a pathlib.Path object.
+        print( f"    Directory {i} name: {dirname}" )
+    print( f"  {len( pathlib_filenames )} files: {pathlib_filenames}" )
+    for i, filename in enumerate( pathlib_filenames, start = 1 ):
+      # filename is a string.
+      print( f"    File {i} name: {filename}" )
     print()
   return all_files
 
