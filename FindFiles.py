@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 from typing import List
+from os.path import join, getsize
 
 """
 Data structure:
@@ -46,6 +47,8 @@ def find_all_files( root_dir: str ) -> List[str]:
   for dirpath, dirnames, filenames in os.walk( root_dir ):
     # dirpath is a string.
     # dirnames and filenames are lists of strings.
+
+    print( f"Directory '{dirpath}' consumes {format( sum( getsize( join( dirpath, name ) ) for name in filenames ), ',' )} bytes on disk (not including subdirectories)." )
 
     # Convert dirpath to Path object.
     pathlib_dirpath = Path( dirpath )
