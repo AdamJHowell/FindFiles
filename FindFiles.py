@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List
 from os.path import join, getsize
 
+
 """
 Data structure:
   absolute_path_to_file: str  # This will be the absolute path with the filename.
