@@ -5,8 +5,18 @@ from pathlib import Path
 from typing import List
 from os.path import join, getsize
 
-
 """
+Program purpose:
+  1. I want a way to easily find which albums I have ripped from CD to any audio file.
+  2. I want to be able to identify which albums need to be re-ripped because of missing tracks.
+    2.a. This will primarily be done by detecting missing track numbers.
+    2.b. This detection can be spoofed by albums with unusual track numbers (e.g. thirty tracks of silence between the penultimate and final track).
+  3. I want to be able to identify which albums were encoded to low-quality audio CODECs (e.g. MP3s).
+  4. I want to know how many albums and tracks I have ripped.
+  5. I want to be able to identify singles and EPs.
+Filesystem file naming format:
+  <album artist> - <album> - <track number> - <track name>
+  This format ensures that any file will be sorted in the correct order, even when mixed with files from other albums and/or other artists.
 Data structure:
   absolute_path_to_file: str  # This will be the absolute path with the filename.
   relative_path_to_file: str  # This will be the absolute_path_to_file with the base directory removed.
