@@ -1,9 +1,9 @@
 import fnmatch
 import os
 from datetime import datetime
+from os.path import join, getsize
 from pathlib import Path
 from typing import List
-from os.path import join, getsize
 
 """
 Program purpose:
@@ -98,11 +98,11 @@ if __name__ == "__main__":
   extension_list = ["flac", "m4a", "mp3", "wav", "aac", "ogg"]
   results_string = ""
 
-  find_all_files( current_directory )
-  raise SystemExit( 0 )
+  # find_all_files( current_directory )
+  # raise SystemExit( 0 )
 
   # Call find_audio_files and parse the returned list.
-  for audio_file in find_audio_files( current_directory, extension_list ):
+  for audio_file in find_files_by_extension( current_directory, extension_list ):
     results_string += audio_file + "\n"
 
   if len( results_string ) > 0:
