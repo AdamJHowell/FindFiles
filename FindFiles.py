@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import fnmatch
 import os
 from datetime import datetime
@@ -32,32 +35,39 @@ os.walk() returns a 3-tuple:
 """
 
 
-def find_files_by_extension( directory: str, extensions: List[str] ) -> List[str]:
+def find_files_by_extension( directory: str, extensions: List[str] ) -> (List[str], List[str]):
   """
   List all files in the specified directory and its subdirectories that have the given extensions.
   @param directory: The directory to search for audio files.
   @param extensions: The extensions to search for.
   @return: A list of audio files.
   """
-  audio_files = []
-  for root, dirs, files in os.walk( directory ):
+  audio_file_list = []
+  empty_dir_list = []
+  for dirpath, dirnames, filenames in os.walk( directory ):
+    if not dirnames and not filenames:
+      empty_dir_list.append( dirpath )
     for extension in extensions:
-      for filename in fnmatch.filter( files, f'*.{extension}' ):
-        audio_files.append( os.path.join( root, filename ) )
-  return audio_files
+      for filename in fnmatch.filter( filenames, f'*.{extension}' ):
+        audio_file_list.append( os.path.join( dirpath, filename ) )
+  return audio_file_list, empty_dir_list
 
 
-def find_all_files( root_dir: str ) -> List[str]:
+def find_all_files( root_dir: str ) -> (List[str], List[str]):
   """
   List all files in the specified directory.
   """
   all_files: List[str] = []
+  empty_dirs = []
   dirpath: str
   dirnames: List[str]
   filenames: List[str]
   for dirpath, dirnames, filenames in os.walk( root_dir ):
     # dirpath is a string.
     # dirnames and filenames are lists of strings.
+
+    if not dirnames and not filenames:
+      empty_dirs.append( dirpath )
 
     print( f"Directory '{dirpath}' consumes {format( sum( getsize( join( dirpath, name ) ) for name in filenames ), ',' )} bytes on disk (not including subdirectories)." )
 
@@ -82,7 +92,7 @@ def find_all_files( root_dir: str ) -> List[str]:
       # filename is a string.
       print( f"    File {i} name: {filename}" )
     print()
-  return all_files
+  return all_files, empty_dirs
 
 
 if __name__ == "__main__":
@@ -101,8 +111,9 @@ if __name__ == "__main__":
   # find_all_files( current_directory )
   # raise SystemExit( 0 )
 
+  audio_files, empty_directories = find_files_by_extension( current_directory, extension_list )
   # Call find_audio_files and parse the returned list.
-  for audio_file in find_files_by_extension( current_directory, extension_list ):
+  for audio_file in audio_files:
     results_string += audio_file + "\n"
 
   if len( results_string ) > 0:
@@ -112,3 +123,10 @@ if __name__ == "__main__":
       print( f"Wrote {write_bytes} bytes to {output_filename}" )
   else:
     print( f"No audio files found at {current_directory}" )
+
+  if len( empty_directories ) > 0:
+    print( "Empty directories:" )
+    for empty_directory in empty_directories:
+      print( f"  {empty_directory}" )
+  else:
+    print( f"No empty directories found at {current_directory}" )
